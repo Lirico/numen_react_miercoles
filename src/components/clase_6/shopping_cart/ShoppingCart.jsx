@@ -13,7 +13,13 @@ const ShoppingCart = () => {
 
     const addToCart = (id) => dispatch({type: TYPES.ADD_TO_CART, payload: id})
 
-    const deleteFromCart = (id) => dispatch({type: TYPES.REMOVE_ONE_PRODUCT, payload: id})
+    const deleteFromCart = (id, all = false) => {
+      if (all) {
+        dispatch({type: TYPES.REMOVE_ALL_PRODUCTS, payload: id})
+      } else {
+        dispatch({type: TYPES.REMOVE_ONE_PRODUCT, payload: id})
+      }
+    }
 
     const clearCart = () => dispatch({type: TYPES.CLEAR_CART})
 
@@ -24,13 +30,13 @@ const ShoppingCart = () => {
       <h3>Productos</h3>
       <div className="box grid-responsive">
         {
-            products.map(product => <Product product={product} addToCart={addToCart} />)
+            products.map(product => <Product key={product.id} product={product} addToCart={addToCart} />)
         }
       </div>   
       <h3>Carrito</h3>
       <div className="box">
         {
-            cart.map(item => <CartItem item={item} deleteFromCart={deleteFromCart} />)
+            cart.map((item, index) => <CartItem key={index} item={item} deleteFromCart={deleteFromCart} />)
         }
       </div>
       <button onClick={clearCart}>Limpiar Carrito</button>
