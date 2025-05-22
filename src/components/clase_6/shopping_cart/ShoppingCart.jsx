@@ -1,15 +1,38 @@
-import { useReducer } from "react";
+import { useReducer, useEffect } from "react";
 import { shoppingInitialState } from "@/shoppingReducer/shoppingInitialState";
 import { shoppingReducer } from "@/shoppingReducer/shoppingReducer";
 import { TYPES } from "@/shoppingReducer/shoppingActions";
 import Product from "./Product";
 import CartItem from "./CartItem";
+import axios from "axios";
 
 const ShoppingCart = () => {
 
     const [state, dispatch] = useReducer(shoppingReducer, shoppingInitialState)
 
     const {products, cart} = state;
+
+    const readState = async () => {
+      const ENDPOINTS = {
+        products: "http://localhost:5000/products",
+        cart: "http://localhost:5000/cart"
+      }
+      const responseProducts = await axios.get(ENDPOINTS.products),
+        responseCart = await axios.get(ENDPOINTS.cart)
+
+      const productsData = await responseProducts.data,
+        cartData = await responseCart.data
+
+      dispatch({type: TYPES.READ_STATE, payload: {
+        products: productsData,
+        cartItems: cartData
+      }})
+    }
+
+    useEffect(() => {
+      readState()
+    }, [])
+    
 
     const addToCart = (id) => dispatch({type: TYPES.ADD_TO_CART, payload: id})
 
