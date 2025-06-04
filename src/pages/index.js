@@ -1,11 +1,11 @@
-import ShoppingCart from "@/components/clase_6/shopping_cart/ShoppingCart";
+import SantosApp from "@/components/clase_8/SantosApp";
 
 
 
 export default function Home() {
   return (
     <>
-      <ShoppingCart />
+      <SantosApp />
     </>
   );
 }
