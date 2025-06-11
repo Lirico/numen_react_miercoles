@@ -1,82 +1,95 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SantosForm from "./SantosForm";
 import SantosTable from "./SantosTable";
+import axios from "axios";
 
-const initialDb = [
-  {
-    id: 1,
-    name: "Seiya",
-    constellation: "Pegaso",
-  },
-  {
-    id: 2,
-    name: "Shiryu",
-    constellation: "Dragon",
-  },
-  {
-    id: 3,
-    name: "Hyoga",
-    constellation: "Cisne",
-  },
-  {
-    id: 4,
-    name: "Shun",
-    constellation: "Andromeda",
-  },
-  {
-    id: 5,
-    name: "Ikki",
-    constellation: "Fenix",
-  },
-];
+const initialDb = [];
 
 const SantosApp = () => {
-    const [db, setDb] = useState(initialDb)
-    const [dataToEdit, setDataToEdit] = useState(null)
+  const [db, setDb] = useState(initialDb);
+  const [dataToEdit, setDataToEdit] = useState(null);
 
-    // GET
-    const readData = () => {}
+  // GET
+  const readData = async () => {
+    const ENDPOINT = "http://localhost:8000/santos";
+    const response = await axios.get(ENDPOINT);
+    const data = response.data;
 
-    // POST
-    const createData = (formData) => {
-      formData.id = Date.now()
+    setDb(data);
+  };
 
-      setDb((db) => {
-        return [
-          ...db,
-          formData
-        ]
-      })
+  useEffect(() => {
+    readData();
+  }, []);
+
+  // POST
+  const createData = async (formData) => {
+    formData.id = String(Date.now());
+    
+    const ENDPOINT = "http://localhost:8000/santos";
+    const REQUEST = {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      data: JSON.stringify(formData),
+    };
+
+    await axios(ENDPOINT, REQUEST);
+
+    readData();
+  };
+
+  // PUT
+  const updateData = async (formData) => {
+    const ENDPOINT = `http://localhost:8000/santos/${formData.id}`;
+
+    const REQUEST = {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      data: JSON.stringify(formData),
+    };
+
+    await axios(ENDPOINT, REQUEST);
+
+    readData();
+  };
+
+  // DELETE
+  const deleteData = async (tableData) => {
+    let isDelete = confirm(
+      `Estas seguro de que queres eliminar a ${tableData.name} de ${tableData.constellation}?`
+    );
+
+    if (isDelete) {
+      const ENDPOINT = `http://localhost:8000/santos/${tableData.id}`;
+
+      const REQUEST = {
+        method: "DELETE",
+        headers: { "content-type": "application/json" }
+      };
+
+      await axios(ENDPOINT, REQUEST);
+
+      readData();
+    } else {
+      return;
     }
-
-    // PUT
-    const updateData = (formData) => {
-      let newData = db.map(caballero => caballero.id === formData.id
-        ? formData
-        : caballero
-      )
-      setDb(newData)
-    }
-
-    // DELETE
-    const deleteData = (tableData) => {
-      let isDelete = confirm(`Estas seguro de que queres eliminar a ${tableData.name} de ${tableData.constellation}?`)
-
-      if(isDelete){
-        let newData = db.filter(caballero => caballero.id !== tableData.id)
-
-        setDb(newData)
-      } else {
-        return;
-      }
-    }
+  };
 
   return (
     <>
       <div>
         <h2>CRUD App</h2>
-        <SantosForm createData={createData} updateData={updateData} dataToEdit={dataToEdit} setDataToEdit={setDataToEdit}/>
-        <SantosTable data={db} deleteData={deleteData} setDataToEdit={setDataToEdit} />
+        <SantosForm
+          createData={createData}
+          updateData={updateData}
+          dataToEdit={dataToEdit}
+          setDataToEdit={setDataToEdit}
+        />
+        <SantosTable
+          data={db}
+          deleteData={deleteData}
+          setDataToEdit={setDataToEdit}
+        />
       </div>
     </>
   );

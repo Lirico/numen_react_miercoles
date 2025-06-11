@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "dbserver":  "npx json-server --port 5000 --watch src/db/db.json"
+    "dbserver": "npx json-server --port 5000 --watch src/db/db.json",
+    "dbsantos": "npx json-server --port 8000 --watch src/db/santos.json"
   },
   "dependencies": {
     "axios": "^1.9.0",
